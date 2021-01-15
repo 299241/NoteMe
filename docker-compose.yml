@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  redis-db:
+    image: "redis:alpine"
+  nginx:
+    build: ./nginx-ssl
+    ports:
+      - "443:443"
+    depends_on:
+      - uwsgi-flask
+  uwsgi-flask:
+    build: ./uwsgi-flask
+    expose:
+      - "8080"
+    environment:
+      FLASK_ENV: development
+      SESSION_SECRET_KEY: $SESSION_SECRET_KEY
+      LOGIN_JWT_SECRET: $LOGIN_JWT_SECRET

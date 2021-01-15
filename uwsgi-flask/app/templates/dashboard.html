@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Dashboard - NoteMe</title>
+    <meta name="title" content="NoteMe">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/noteme_icon/noteme_icon_16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/noteme_icon/noteme_icon_32.png">
+    <link rel="icon" type="image/png" sizes="180x180" href="img/noteme_icon/noteme_icon_180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="img/noteme_icon/noteme_icon_192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="img/noteme_icon/noteme_icon_512.png">
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="fonts/fontawesome5-overrides.min.css">
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+        <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0" style="background: linear-gradient(-70deg, #43CBFF 16%, #9708cc 100%);">
+            <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                    <div class="sidebar-brand-icon rotate-n-15"><i class="far fa-sticky-note"></i></div>
+                    <div class="sidebar-brand-text mx-3"><span>NOTE.ME</span></div>
+                </a>
+                <hr class="sidebar-divider my-0">
+                <ul class="nav navbar-nav text-light" id="accordionSidebar">
+                    <li class="nav-item"><a class="nav-link active" href="/"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="/notes"><i class="fa fa-sticky-note"></i><span>Notatki</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="/shared-with-me"><i class="fa fa-group"></i><span>Udostępnione dla mnie</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="/public-notes"><i class="fa fa-globe"></i><span>Publiczne notatki</span></a></li>
+                </ul>
+                <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
+            </div>
+        </nav>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle mr-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
+                        <ul class="nav navbar-nav flex-nowrap ml-auto">
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small">{{ user_first_name}} {{ user_last_name }}</span><img class="border rounded-circle img-profile" src="img/avatars/avatar.jpeg"></a>
+                                    <div class="dropdown-menu shadow dropdown-menu-right animated--grow-in"><a class="dropdown-item" href="logout"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Wyloguj</a></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="container-fluid">
+                    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+                        <h3 class="text-dark mb-0">Dashboard</h3>
+                    </div>
+                    {% if alert_type %}
+                    <div class="alert alert-{{ alert_type }}" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button><span>{{ alert_msg }}</span></div>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-lg-7 col-xl-8">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="text-primary m-0 font-weight-bold">Dodaj notatkę</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form action="/add-note" method="post" enctype="multipart/form-data">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                        <div class="form-group"><label><strong>Tytuł</strong></label><input class="form-control" type="text" id="title" required="" name="title"></div>
+                                        <div class="form-group"><label><strong>Opis</strong></label><textarea class="form-control" id="description" maxlength="1024" name="description"></textarea></div>
+                                        <div class="form-group"><input type="file" id="files" name="files[]" class="form-control" multiple="" style="padding-top: 3px;padding-left: 3px;"></div>
+                                        <div class="form-group"><label><strong>Rodzaj notatki</strong></label><select class="form-control form-control" id="type" name="type">
+                                                <option value="private-note" selected="">Notatka prywatna</option>
+                                                <option value="encrypt-note">Notatka szyfrowana</option>
+                                                <option value="public-note">Notatka publiczna</option>
+                                                <option value="shared-note">Notatka udostępniona wybranym użytkownikom</option>
+                                            </select></div>
+                                        <div id="secret-password" class="form-group"><label><strong>Tajne hasło</strong></label><input class="form-control" type="password" id="secret-password" name="secret-password"></div>
+                                        <div id="shared-to" class="form-group"><label><strong>Udostępnij osobom</strong></label>
+                                            {% for user_email in user_emails %}
+                                            <div class="form-control overflow-auto" style="height: 95px;">
+                                                <div class="form-check"><input class="form-check-input" type="checkbox" value="{{  user_email }}" id="{{ user_email }}" name="shared-with"><label class="form-check-label" for="{{ user_email }}">{{ user_email }}</label></div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="form-group"><button class="btn btn-primary" type="submit">Dodaj notatkę</button></div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 col-xl-4" style="padding: 20;">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="text-primary m-0 font-weight-bold">Ostatnie logowania</h6>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    {% for log in login_logs %}
+                                    <li class="list-group-item no-gutters">
+                                        <div class="row align-items-center no-gutters">
+                                            <div class="col col-auto"><span style="margin-right: 12px;"><strong>{{ log.ip }}</strong></span><span>{{ log.date }}</span></div>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="bg-white sticky-footer">
+                <div class="container my-auto">
+                    <div class="text-center my-auto copyright"><span>Copyright © NoteMe by Daniel Daczko 2021</span></div>
+                </div>
+            </footer>
+        </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <script src="js/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/add-note.js"></script>
+</body>
+
+</html>

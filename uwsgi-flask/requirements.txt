@@ -1,0 +1,11 @@
+Flask
+flask-sqlalchemy
+flask_wtf
+flask-jwt-extended
+gunicorn
+uwsgi
+redis
+passlib
+requests
+pycryptodome
+pycryptodomex
